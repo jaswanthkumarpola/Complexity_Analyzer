@@ -15,9 +15,9 @@ A locally-run tool that predicts the time and space complexity (Big-O) of source
 ```bash
 cd AI_Complexity_Analyzer
 python3 -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
+source venv/bin/activate         
 pip install -r requirements.txt
-cp .env.example .env              # then edit .env (see below)
+cp .env.example .env              
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
