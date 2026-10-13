@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Complexity Analyzer — Understand the Computational Cost of Your Code</title>
+  <meta name="description" content="AI-powered tool that predicts time and space complexity of your code using static analysis and large language models. Supports 30+ programming languages." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="app-header" role="banner">
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="36" height="36" rx="10" fill="url(#logoGrad)"/>
+            <path d="M10 26 L18 10 L26 26" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 21 L23 21" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+            <circle cx="18" cy="10" r="2" fill="#C4B5FD"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#7C3AED"/>
+                <stop offset="1" stop-color="#4C1D95"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1 class="app-title">AI Complexity Analyzer</h1>
+          <p class="app-subtitle">Understand the computational cost of your code</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-badge" id="status-badge" role="status" aria-live="polite">
+          <span class="status-dot" id="status-dot"></span>
+          <span class="status-label" id="status-label">Checking…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="app-main" id="main-content">
+    <div class="workspace">
+
+      <!-- ===== LEFT: Code Input ===== -->
+      <section class="panel input-panel" aria-labelledby="input-heading">
+        <div class="panel-header">
+          <h2 class="panel-title" id="input-heading">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Source Code
+          </h2>
+          <div class="panel-meta">
+            <span class="char-count" id="char-count">0 chars</span>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="editor-toolbar" role="toolbar" aria-label="Editor controls">
+          <!-- Language selector -->
+          <div class="form-group lang-group">
+            <label class="sr-only" for="lang-select">Programming language</label>
+            <div class="select-wrapper">
+              <select id="lang-select" class="lang-select" aria-label="Select programming language">
+                <option value="">Auto-detect</option>
+              </select>
+              <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <span class="detect-badge hidden" id="detect-badge" aria-live="polite"></span>
+          </div>
+
+          <!-- Actions -->
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost btn-sm" id="btn-example" title="Load example code" aria-haspopup="listbox">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Examples
+            </button>
+            <button class="btn btn-ghost btn-sm" id="btn-upload" title="Upload source file" aria-label="Upload source code file">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              Upload
+            </button>
+            <button class="btn btn-ghost btn-sm" id="btn-clear" title="Clear editor" aria-label="Clear code editor">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden file input -->
+        <input type="file" id="file-input" accept=".py,.js,.ts,.tsx,.java,.cpp,.cxx,.cc,.c,.h,.cs,.go,.rs,.kt,.swift,.rb,.php,.scala,.r,.jl,.dart,.lua,.pl,.hs,.ex,.exs,.sql,.sh,.bash,.ps1,.m,.f,.f90,.asm,.sol,.erl" style="display:none" aria-label="Choose source file to upload" />
+
+        <!-- Upload feedback -->
+        <div class="upload-info hidden" id="upload-info" role="status" aria-live="polite">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="upload-filename"></span>
+          <button class="btn-icon-sm" id="btn-clear-file" aria-label="Remove uploaded file">×</button>
+        </div>
+
+        <!-- Code editor -->
+        <div class="editor-container">
+          <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
+          <textarea
+            id="code-editor"
+            class="code-editor"
+            placeholder="Paste or type your source code here…&#10;&#10;Or click 'Examples' to load a demonstration."
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            aria-label="Source code editor"
+            aria-multiline="true"
+          ></textarea>
+        </div>
+
+        <!-- Analyze button -->
+        <div class="analyze-row">
+          <div class="ai-notice" id="ai-notice" aria-live="polite">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="ai-notice-text">AI mode: checking…</span>
+          </div>
+          <button class="btn btn-primary btn-analyze" id="btn-analyze" aria-label="Analyze code complexity">
+            <svg class="icon" id="analyze-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span class="btn-spinner hidden" id="btn-spinner" aria-hidden="true"></span>
+            <span id="analyze-label">Analyze Code</span>
+          </button>
+        </div>
+
+        <!-- Examples dropdown (hidden by default) -->
+        <div class="examples-menu hidden" id="examples-menu" role="listbox" aria-label="Example programs">
+          <div class="examples-menu-header">Load Example</div>
+          <button class="example-item" data-example="constant" role="option">
+            <span class="example-badge badge-green">O(1)</span>
+            <span>Constant — Array head access</span>
+          </button>
+          <button class="example-item" data-example="linear" role="option">
+            <span class="example-badge badge-blue">O(n)</span>
+            <span>Linear — Array sum</span>
+          </button>
+          <button class="example-item" data-example="quadratic" role="option">
+            <span class="example-badge badge-yellow">O(n²)</span>
+            <span>Quadratic — Bubble sort</span>
+          </button>
+          <button class="example-item" data-example="logarithmic" role="option">
+            <span class="example-badge badge-cyan">O(log n)</span>
+            <span>Logarithmic — Binary search</span>
+          </button>
+          <button class="example-item" data-example="linearithmic" role="option">
+            <span class="example-badge badge-purple">O(n log n)</span>
+            <span>Linearithmic — Merge sort</span>
+          </button>
+          <button class="example-item" data-example="exponential" role="option">
+            <span class="example-badge badge-red">O(2ⁿ)</span>
+            <span>Exponential — Naive Fibonacci</span>
+          </button>
+          <button class="example-item" data-example="memoized" role="option">
+            <span class="example-badge badge-blue">O(n)</span>
+            <span>Memoized Fibonacci (optimized)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== RIGHT: Results ===== -->
+      <section class="panel results-panel" id="results-panel" aria-labelledby="results-heading" aria-live="polite">
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon" aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" stroke="#2A293A" stroke-width="2"/>
+              <path d="M20 44 L32 20 L44 44" stroke="#4C1D95" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+              <path d="M24 38 L40 38" stroke="#6D28D9" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+              <circle cx="32" cy="20" r="3" fill="#7C3AED" opacity="0.8"/>
+            </svg>
+          </div>
+          <h2 class="panel-title" id="results-heading">Analysis Results</h2>
+          <p class="empty-text">Enter or upload source code, then click <strong>Analyze Code</strong> to see complexity predictions.</p>
+          <div class="empty-features">
+            <div class="empty-feature"><span class="feat-dot"></span>Time &amp; space complexity</div>
+            <div class="empty-feature"><span class="feat-dot"></span>Growth visualization</div>
+            <div class="empty-feature"><span class="feat-dot"></span>Optimization suggestions</div>
+          </div>
+        </div>
+
+        <!-- Results content (hidden until analysis) -->
+        <div class="results-content hidden" id="results-content">
+
+          <!-- Analysis header -->
+          <div class="results-header">
+            <h2 class="panel-title" id="results-heading-active">Analysis Results</h2>
+            <div class="results-meta">
+              <span class="method-badge" id="method-badge"></span>
+              <span class="lang-detected" id="lang-detected"></span>
+            </div>
+          </div>
+
+          <!-- Complexity cards -->
+          <div class="complexity-cards">
+            <div class="complexity-card card-time" role="article" aria-labelledby="time-label">
+              <div class="card-header">
+                <span class="card-icon" aria-hidden="true">⏱</span>
+                <span class="card-label" id="time-label">Time Complexity</span>
+              </div>
+              <div class="card-expression" id="time-expression" aria-live="polite">—</div>
+              <div class="card-confidence" id="time-confidence"></div>
+              <div class="card-justification" id="time-justification"></div>
+            </div>
+            <div class="complexity-card card-space" role="article" aria-labelledby="space-label">
+              <div class="card-header">
+                <span class="card-icon" aria-hidden="true">🗄</span>
+                <span class="card-label" id="space-label">Space Complexity</span>
+              </div>
+              <div class="card-expression" id="space-expression" aria-live="polite">—</div>
+              <div class="card-confidence" id="space-confidence"></div>
+              <div class="card-justification" id="space-justification"></div>
+            </div>
+          </div>
+
+          <!-- Case analysis -->
+          <div class="case-analysis" id="case-analysis-section">
+            <h3 class="section-title">Case Analysis</h3>
+            <div class="cases-grid">
+              <div class="case-card best">
+                <span class="case-label">Best Case</span>
+                <span class="case-value" id="best-case">—</span>
+              </div>
+              <div class="case-card avg">
+                <span class="case-label">Average Case</span>
+                <span class="case-value" id="avg-case">—</span>
+              </div>
+              <div class="case-card worst">
+                <span class="case-label">Worst Case</span>
+                <span class="case-value" id="worst-case">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Explanation -->
+          <div class="explanation-section" id="explanation-section">
+            <h3 class="section-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Explanation
+            </h3>
+            <div class="explanation-body" id="explanation-body"></div>
+          </div>
+
+          <!-- Static Evidence -->
+          <div class="evidence-section" id="evidence-section">
+            <h3 class="section-title collapsible" id="evidence-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="evidence-body">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Static Evidence
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </h3>
+            <div class="evidence-body hidden" id="evidence-body">
+              <div class="evidence-grid" id="evidence-grid"></div>
+            </div>
+          </div>
+
+          <!-- Assumptions & Warnings -->
+          <div class="assumptions-section" id="assumptions-section">
+            <div class="assumptions-body" id="assumptions-body"></div>
+          </div>
+
+          <!-- Complexity Chart -->
+          <div class="chart-section" id="chart-section">
+            <h3 class="section-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Complexity Growth Curves
+            </h3>
+            <p class="chart-disclaimer" id="chart-disclaimer"></p>
+            <div class="chart-wrapper">
+              <canvas id="complexity-chart" role="img" aria-label="Complexity growth comparison chart"></canvas>
+            </div>
+            <div class="chart-legend" id="chart-legend"></div>
+          </div>
+
+          <!-- Optimizations -->
+          <div class="optimizations-section" id="optimizations-section">
+            <h3 class="section-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Optimization Suggestions
+            </h3>
+            <div id="optimizations-list"></div>
+          </div>
+
+        </div><!-- /results-content -->
+
+        <!-- Loading overlay -->
+        <div class="loading-overlay hidden" id="loading-overlay" role="status" aria-label="Analyzing code">
+          <div class="loading-card">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <div class="loading-title">Analyzing Code…</div>
+            <div class="loading-steps" id="loading-steps">
+              <div class="loading-step active" id="step-detect">Detecting language</div>
+              <div class="loading-step" id="step-parse">Parsing structure</div>
+              <div class="loading-step" id="step-rules">Applying complexity rules</div>
+              <div class="loading-step" id="step-ai">AI reasoning</div>
+              <div class="loading-step" id="step-result">Building results</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error state -->
+        <div class="error-state hidden" id="error-state" role="alert">
+          <div class="error-icon" aria-hidden="true">⚠</div>
+          <div class="error-title">Analysis Failed</div>
+          <div class="error-message" id="error-message"></div>
+          <button class="btn btn-ghost btn-sm" id="btn-retry">Try Again</button>
+        </div>
+
+      </section>
+    </div><!-- /workspace -->
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-name">AI Complexity Analyzer</span>
+        <span class="footer-sep">·</span>
+        <span class="footer-note">Academic project prototype</span>
+      </div>
+      <div class="footer-center">
+        <span class="footer-disclaimer">
+          Complexity predictions are estimates based on structural analysis and AI reasoning. Results are not mathematical proofs.
+          Code submitted for AI analysis is sent to the configured external provider.
+        </span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-version" id="footer-version">v1.0.0</span>
+        <a href="/docs" class="footer-link" target="_blank" rel="noopener">API Docs</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chart.js CDN with integrity check -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+    integrity="sha256-oVuKlyyMt8sBOCY9V5yFv+mRqlgFzISnRCVPMLFWqIs="
+    crossorigin="anonymous"
+    onerror="window.CHARTJS_FAILED=true">
+  </script>
+
+  <!-- App scripts -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/editor.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/results.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
