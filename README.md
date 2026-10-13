@@ -1,7 +1,5 @@
 # AI-Based Complexity Prediction Tool
 
-> **Academic University Project** — A locally-runnable tool that predicts algorithmic time and space complexity using static code analysis combined with an optional AI language model.
-
 ---
 
 ## Overview
