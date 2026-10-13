@@ -1,0 +1,12 @@
+.env
+venv/
+.venv/
+.git
+.gitignore
+__pycache__/
+*.pyc
+.pytest_cache/
+.vscode/
+claude_context.txt
+bundle.py
+tests/
