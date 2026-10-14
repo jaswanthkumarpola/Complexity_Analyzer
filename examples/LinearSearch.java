@@ -2,15 +2,6 @@
 
 public class LinearSearch {
 
-    /**
-     * Search for a target value in an unsorted array.
-     *
-     * Time Complexity: O(n) — must inspect up to n elements.
-     * Space Complexity: O(1) — no additional storage proportional to input.
-     *
-     * Best case: O(1) — target is the first element.
-     * Worst case: O(n) — target is last or not present.
-     */
     public static int linearSearch(int[] arr, int target) {
         for (int i = 0; i < arr.length; i++) {
             if (arr[i] == target) {
